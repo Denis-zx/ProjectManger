@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创建项目</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f5f5f7;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .status-bar {
+            height: 47px;
+            background: #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+        }
+        .nav-header {
+            background: white;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        .nav-back {
+            width: 36px;
+            height: 36px;
+            background: #f0f0f2;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #666;
+        }
+        .nav-title { font-size: 17px; font-weight: 600; color: #1c1c1e; }
+        .nav-submit {
+            font-size: 15px;
+            font-weight: 600;
+            color: #667eea;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+        .content-area { flex: 1; padding: 16px; overflow-y: auto; }
+        .form-section {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-bottom: 16px;
+        }
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1c1c1e;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f0f0f2;
+        }
+        .form-item { margin-bottom: 16px; }
+        .form-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .form-label.required::after { content: '*'; color: #ff3b30; }
+        .form-input {
+            width: 100%;
+            height: 44px;
+            background: #f8f9fa;
+            border: 1px solid #e5e5ea;
+            border-radius: 12px;
+            padding: 0 14px;
+            font-size: 15px;
+            color: #1c1c1e;
+            outline: none;
+            box-sizing: border-box;
+        }
+        .form-input:focus { border-color: #667eea; background: white; }
+        .form-textarea {
+            width: 100%;
+            min-height: 100px;
+            background: #f8f9fa;
+            border: 1px solid #e5e5ea;
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-size: 15px;
+            color: #1c1c1e;
+            outline: none;
+            resize: none;
+            box-sizing: border-box;
+        }
+        .form-textarea:focus { border-color: #667eea; background: white; }
+        .form-select {
+            width: 100%;
+            height: 44px;
+            background: #f8f9fa;
+            border: 1px solid #e5e5ea;
+            border-radius: 12px;
+            padding: 0 14px;
+            font-size: 15px;
+            color: #1c1c1e;
+            outline: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath fill='%238e8e93' d='M10 12l-5-5 1.41-1.41L10 9.17l3.59-3.58L15 7z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+        }
+        .date-picker { position: relative; }
+        .date-picker input { padding-right: 40px; }
+        .date-picker i {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8e8e93;
+        }
+        .member-select { display: flex; flex-wrap: wrap; gap: 10px; }
+        .member-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #f0f0f2;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .member-chip:hover { background: #e5e5ea; }
+        .member-chip.selected { background: rgba(102, 126, 234, 0.15); color: #667eea; }
+        .member-chip .avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .footer-space { height: 100px; }
+    </style>
+</head>
+<body>
+    <div class="status-bar">
+        <span>9:41</span>
+        <span><i class="fa-solid fa-signal"></i> <i class="fa-solid fa-wifi"></i> <i class="fa-solid fa-battery-full"></i></span>
+    </div>
+    
+    <div class="nav-header">
+        <div class="nav-back" onclick="goBack()"><i class="fa-solid fa-chevron-left"></i></div>
+        <div class="nav-title">新建项目</div>
+        <span class="nav-submit" onclick="submitForm()">保存</span>
+    </div>
+    
+    <div class="content-area">
+        <div class="form-section">
+            <div class="section-title">基本信息</div>
+            <div class="form-item">
+                <label class="form-label required">项目名称</label>
+                <input type="text" class="form-input" placeholder="请输入项目名称">
+            </div>
+            <div class="form-item">
+                <label class="form-label required">初始环节</label>
+                <select class="form-select">
+                    <option value="1">初访</option>
+                    <option value="2">收资料-建档</option>
+                    <option value="3">形成报告</option>
+                    <option value="4">审批中</option>
+                    <option value="5">放款</option>
+                </select>
+            </div>
+            <div class="form-item">
+                <label class="form-label required">项目负责人</label>
+                <div class="member-select">
+                    <div class="member-chip selected"><div class="avatar">张</div><span>张三</span></div>
+                    <div class="member-chip"><div class="avatar">李</div><span>李四</span></div>
+                    <div class="member-chip"><div class="avatar">王</div><span>王五</span></div>
+                    <div class="member-chip"><div class="avatar">赵</div><span>赵六</span></div>
+                </div>
+            </div>
+            <div class="form-item">
+                <label class="form-label required">预计完成时间</label>
+                <div class="date-picker">
+                    <input type="date" class="form-input">
+                    <i class="fa-solid fa-calendar"></i>
+                </div>
+            </div>
+            <div class="form-item">
+                <label class="form-label required">项目描述</label>
+                <textarea class="form-textarea" placeholder="请输入项目简要描述"></textarea>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <div class="section-title">可选信息</div>
+            <div class="form-item">
+                <label class="form-label">关联客户/合作方</label>
+                <input type="text" class="form-input" placeholder="请输入客户名称">
+            </div>
+            <div class="form-item">
+                <label class="form-label">预计效益</label>
+                <input type="text" class="form-input" placeholder="请输入预计效益金额">
+            </div>
+            <div class="form-item">
+                <label class="form-label">初始备注</label>
+                <textarea class="form-textarea" placeholder="请输入初始备注"></textarea>
+            </div>
+        </div>
+        
+        <div class="footer-space"></div>
+    </div>
+    
+    <script>
+        function goBack() { window.parent.document.getElementById('main-content').src = 'team-kanban.html'; }
+        function submitForm() { alert('项目创建成功'); }
+    </script>
+</body>
+</html>

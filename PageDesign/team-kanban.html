@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>团队看板</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f5f5f7;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .status-bar {
+            height: 47px;
+            background: #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+        }
+        .nav-header {
+            background: white;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        .nav-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1c1c1e;
+        }
+        .nav-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .nav-btn {
+            width: 36px;
+            height: 36px;
+            background: #f0f0f2;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #666;
+        }
+        .nav-btn:hover {
+            background: #e5e5ea;
+        }
+        .nav-btn.add-btn {
+            background: #667eea;
+            color: white;
+        }
+        .nav-btn.add-btn:hover {
+            background: #5a6fd6;
+        }
+        .kanban-container {
+            flex: 1;
+            overflow-x: auto;
+            padding: 16px;
+            white-space: nowrap;
+        }
+        .kanban-columns {
+            display: inline-flex;
+            gap: 12px;
+            padding-bottom: 16px;
+        }
+        .kanban-column {
+            width: 260px;
+            background: #f0f0f2;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .column-header {
+            padding: 12px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .column-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+        }
+        .column-count {
+            background: #e5e5ea;
+            color: #666;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        .column-toggle {
+            width: 24px;
+            height: 24px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8e8e93;
+            cursor: pointer;
+        }
+        .column-toggle:hover {
+            background: #e5e5ea;
+        }
+        .column-content {
+            flex: 1;
+            padding: 8px;
+            overflow-y: auto;
+            max-height: 520px;
+        }
+        .project-card {
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 4px solid #667eea;
+            position: relative;
+        }
+        .project-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .project-card.overdue {
+            border-left-color: #ff3b30;
+            background: #fff8f8;
+        }
+        .project-card.warning {
+            border-left-color: #ff9500;
+        }
+        .warning-icon {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 14px;
+            color: #ff9500;
+        }
+        .project-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1c1c1e;
+            margin-bottom: 6px;
+            line-height: 1.4;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .project-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        .time-badge {
+            font-size: 11px;
+            color: #8e8e93;
+            background: #f5f5f7;
+            padding: 3px 7px;
+            border-radius: 8px;
+        }
+        .time-badge.warning {
+            color: #ff9500;
+            background: #fff8e5;
+        }
+        .time-badge.overdue {
+            color: #ff3b30;
+            background: #ffeef0;
+        }
+        .project-owner {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .owner-avatar {
+            width: 22px;
+            height: 22px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        .owner-name {
+            font-size: 11px;
+            color: #8e8e93;
+        }
+        .project-desc {
+            font-size: 11px;
+            color: #8e8e93;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        .project-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 8px;
+            border-top: 1px solid #f0f0f2;
+        }
+        .create-time {
+            font-size: 10px;
+            color: #c7c7cc;
+        }
+        .card-actions {
+            display: flex;
+            gap: 6px;
+        }
+        .card-action-btn {
+            width: 24px;
+            height: 24px;
+            background: #f5f5f7;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8e8e93;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .card-action-btn:hover {
+            background: #e5e5ea;
+            color: #667eea;
+        }
+        .maintenance-column {
+            background: #f0f9ff;
+        }
+        .maintenance-column .column-header {
+            background: rgba(102, 126, 234, 0.1);
+        }
+        .maintenance-subcolumns {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 0 8px;
+        }
+        .maintenance-subcolumn {
+            background: white;
+            border-radius: 12px;
+            padding: 10px;
+        }
+        .subcolumn-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .maintenance-card {
+            background: #fafafa;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid #007aff;
+        }
+        .maintenance-card:hover {
+            background: #f0f0f2;
+        }
+        .maintenance-card:last-child {
+            margin-bottom: 0;
+        }
+        .reserve-entry {
+            background: linear-gradient(135deg, #f5f0ff 0%, #f0f5ff 100%);
+            border-radius: 16px;
+            padding: 14px;
+            margin-top: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px dashed #c7c7cc;
+        }
+        .reserve-entry:hover {
+            background: linear-gradient(135deg, #ebe4ff 0%, #e4edff 100%);
+            border-color: #667eea;
+        }
+        .reserve-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+        .reserve-text {
+            font-size: 13px;
+            font-weight: 500;
+            color: #667eea;
+        }
+        .reserve-count {
+            font-size: 11px;
+            color: #8e8e93;
+            margin-top: 2px;
+        }
+        .tab-bar {
+            background: white;
+            padding: 8px 0;
+            display: flex;
+            justify-content: space-around;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #8e8e93;
+            cursor: pointer;
+            padding: 4px 20px;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+        .tab-item.active {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        .tab-item i {
+            font-size: 22px;
+        }
+        .tab-item span {
+            font-size: 11px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="status-bar">
+        <span>9:41</span>
+        <span><i class="fa-solid fa-signal"></i> <i class="fa-solid fa-wifi"></i> <i class="fa-solid fa-battery-full"></i></span>
+    </div>
+    
+    <div class="nav-header">
+        <div class="nav-title">团队看板</div>
+        <div class="nav-actions">
+            <div class="nav-btn" onclick="showSearch()">
+                <i class="fa-solid fa-search"></i>
+            </div>
+            <div class="nav-btn" onclick="showFilter()">
+                <i class="fa-solid fa-filter"></i>
+            </div>
+            <div class="nav-btn" onclick="refreshBoard()">
+                <i class="fa-solid fa-refresh"></i>
+            </div>
+            <div class="nav-btn add-btn" onclick="showCreate()">
+                <i class="fa-solid fa-plus"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="kanban-container">
+        <div class="kanban-columns">
+            <div class="kanban-column">
+                <div class="column-header">
+                    <span class="column-title">初访</span>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span class="column-count">3</span>
+                        <button class="column-toggle"><i class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                </div>
+                <div class="column-content">
+                    <div class="project-card">
+                        <div class="project-name">客户A贷款咨询</div>
+                        <div class="project-meta">
+                            <span class="time-badge">2天3小时</span>
+                            <div class="project-owner">
+                                <div class="owner-avatar">张</div>
+                                <span class="owner-name">张三</span>
+                            </div>
+                        </div>
+                        <div class="project-desc">客户咨询个人住房贷款业务，需要详细了解贷款利率及还款方式</div>
+                        <div class="project-footer">
+                            <span class="create-time">04-25</span>
+                            <div class="card-actions">
+                                <div class="card-action-btn"><i class="fa-solid fa-ellipsis-h"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-card warning">
+                        <i class="fa-solid fa-exclamation-circle warning-icon"></i>
+                        <div class="project-name">企业B融资项目</div>
+                        <div class="project-meta">
+                            <span class="time-badge warning">2天23小时</span>
+                            <div class="project-owner">
+                                <div class="owner-avatar">李</div>
+                                <span class="owner-name">李四</span>
+                            </div>
+                        </div>
+                        <div class="project-desc">企业流动资金贷款申请</div>
+                        <div class="project-footer">
+                            <span class="create-time">04-25</span>
+                            <div class="card-actions">
+                                <div class="card-action-btn"><i class="fa-solid fa-ellipsis-h"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <div class="project-name">个人C消费贷申请</div>
+                        <div class="project-meta">
+                            <span class="time-badge">1天5小时</span>
+                            <div class="project-owner">
+                                <div class="owner-avatar">王</div>
+                                <span class="owner-name">王五</span>
+                            </div>
+                        </div>
+                        <div class="project-desc">个人消费贷款，用于购买家电</div>
+                        <div class="project-footer">
+                            <span class="create-time">04-27</span>
+                            <div class="card-actions">
+                                <div class="card-action-btn"><i class="fa-solid fa-ellipsis-h"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="kanban-column">
+                <div class="column-header">
+                    <span class="column-title">收资料-建档</span>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span class="column-count">2</span>
+                        <button class="column-toggle"><i class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                </div>
+                <div class="column-content">
+                    <div class="project-card">
+                        <div class="project-name">客户D车贷申请</div>
+                        <div class="project-meta">
+                            <span class="time-badge">1天12小时</span>
+                            <div class="project-owner">
+                                <div class="owner-avatar">赵</div>
+                                <span class="owner-name">赵六</span>
+                            </div>
+                        </div>
+                        <div class="project-desc">车辆抵押贷款，已收集基本资料</div>
+                        <div class="project-footer">
+                            <span class="create-time">04-26</span>
+                            <div class="card-actions">
+                                <div class="card-action-btn"><i class="fa-solid fa-ellipsis-h"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-card overdue">
+                        <div class="project-name">客户E装修贷款</div>
+                        <div class="project-meta">
+                            <span class="time-badge overdue">5天2小时</span>
+                            <div class="project-owner">
+                                <div class="owner-avatar">孙</div>
+                                <span class="owner-name">孙七</span>
+                            </div>
+                        </div>
+                        <div class="project-desc">装修贷款申请，资料收集阶段</div>
+                        <div class="project-footer">
+                            <span class="create-time">04-22</span>
+                            <div class="card-actions">
+                                <div class="card-action-btn"><i class="fa-solid fa-ellipsis-h"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="kanban-column">
+                <div class="column-header">
+                    <span class="column-title">形成报告</span>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span class="column-count">1</span>
+                        <button class="column-toggle"><i class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                </div>
+                <div class="column-content">
+                    <div class="project-card">
+                        <div class="project-name">企业F投资项目</div>
+                        <div class="project-meta">
+                            <span class="time-badge">3天8小时</span>
+                            <div class="project-owner">
+                                <div class="owner-avatar">周</div>
+                                <span class="owner-name">周八</span>
+                            </div>
+                        </div>
+                        <div class="project-desc">大型投资项目贷款，正在撰写可行性报告</div>
+                        <div class="project-footer">
+                            <span class="create-time">04-24</span>
+                            <div class="card-actions">
+                                <div class="card-action-btn"><i class="fa-solid fa-ellipsis-h"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="kanban-column">
+                <div class="column-header">
+                    <span class="column-title">审批中</span>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span class="column-count">2</span>
+                        <button class="column-toggle"><i class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                </div>
+                <div class="column-content">
+                    <div class="project-card">
+                        <div class="project-name">客户G经营贷申请</div>
+                        <div class="project-meta">
+                            <span class="time-badge">2天15小时</span>
+                            <div class="project-owner">
+                                <div class="owner-avatar">吴</div>
+                                <span class="owner-name">吴九</span>
+                            </div>
+                        </div>
+                        <div class="project-desc">个体工商户经营贷款</div>
+                        <div class="project-footer">
+                            <span class="create-time">04-25</span>
+                            <div class="card-actions">
+                                <div class="card-action-btn"><i class="fa-solid fa-ellipsis-h"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <div class="project-name">客户H留学贷款</div>
+                        <div class="project-meta">
+                            <span class="time-badge">1天6小时</span>
+                            <div class="project-owner">
+                                <div class="owner-avatar">郑</div>
+                                <span class="owner-name">郑十</span>
+                            </div>
+                        </div>
+                        <div class="project-desc">出国留学贷款申请</div>
+                        <div class="project-footer">
+                            <span class="create-time">04-27</span>
+                            <div class="card-actions">
+                                <div class="card-action-btn"><i class="fa-solid fa-ellipsis-h"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="kanban-column">
+                <div class="column-header">
+                    <span class="column-title">放款</span>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span class="column-count">1</span>
+                        <button class="column-toggle"><i class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                </div>
+                <div class="column-content">
+                    <div class="project-card">
+                        <div class="project-name">客户I房贷项目</div>
+                        <div class="project-meta">
+                            <span class="time-badge">5小时</span>
+                            <div class="project-owner">
+                                <div class="owner-avatar">张</div>
+                                <span class="owner-name">张三</span>
+                            </div>
+                        </div>
+                        <div class="project-desc">个人住房按揭贷款，已完成审批待放款</div>
+                        <div class="project-footer">
+                            <span class="create-time">04-18</span>
+                            <div class="card-actions">
+                                <div class="card-action-btn"><i class="fa-solid fa-ellipsis-h"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="kanban-column maintenance-column">
+                <div class="column-header">
+                    <span class="column-title">日常维护</span>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span class="column-count">4</span>
+                        <button class="column-toggle"><i class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                </div>
+                <div class="column-content">
+                    <div class="maintenance-subcolumns">
+                        <div class="maintenance-subcolumn">
+                            <div class="subcolumn-title">
+                                <i class="fa-solid fa-phone"></i>
+                                待回访
+                            </div>
+                            <div class="maintenance-card">
+                                <div class="project-name">客户J信用卡回访</div>
+                                <div class="project-meta">
+                                    <span class="time-badge">3天</span>
+                                    <div class="project-owner">
+                                        <div class="owner-avatar">李</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="maintenance-card">
+                                <div class="project-name">客户K贷款跟进</div>
+                                <div class="project-meta">
+                                    <span class="time-badge">1天</span>
+                                    <div class="project-owner">
+                                        <div class="owner-avatar">王</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="maintenance-subcolumn">
+                            <div class="subcolumn-title">
+                                <i class="fa-solid fa-trending-up"></i>
+                                挖潜中
+                            </div>
+                            <div class="maintenance-card">
+                                <div class="project-name">客户L增贷潜力</div>
+                                <div class="project-meta">
+                                    <span class="time-badge">5天</span>
+                                    <div class="project-owner">
+                                        <div class="owner-avatar">赵</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="maintenance-card">
+                                <div class="project-name">客户M交叉销售</div>
+                                <div class="project-meta">
+                                    <span class="time-badge">2天</span>
+                                    <div class="project-owner">
+                                        <div class="owner-avatar">孙</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="reserve-entry" onclick="goToReserve()">
+                        <div class="reserve-icon">
+                            <i class="fa-solid fa-archive"></i>
+                        </div>
+                        <div class="reserve-text">储备项目库</div>
+                        <div class="reserve-count">查看已废止项目 (6)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tab-bar">
+        <div class="tab-item active">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>团队看板</span>
+        </div>
+        <div class="tab-item" onclick="goToPersonal()">
+            <i class="fa-solid fa-user"></i>
+            <span>个人看板</span>
+        </div>
+        <div class="tab-item" onclick="goToManagement()">
+            <i class="fa-solid fa-bar-chart"></i>
+            <span>管理看板</span>
+        </div>
+        <div class="tab-item" onclick="goToProfile()">
+            <i class="fa-solid fa-user-circle"></i>
+            <span>我的</span>
+        </div>
+    </div>
+    
+    <script>
+        function showSearch() { alert('搜索功能'); }
+        function showFilter() { alert('筛选功能'); }
+        function refreshBoard() { alert('刷新成功'); }
+        function showCreate() { window.parent.document.getElementById('main-content').src = 'project-create.html'; }
+        function goToReserve() { window.parent.document.getElementById('main-content').src = 'reserve-projects.html'; }
+        function goToPersonal() { window.parent.document.getElementById('main-content').src = 'personal-kanban.html'; }
+        function goToManagement() { window.parent.document.getElementById('main-content').src = 'management-dashboard.html'; }
+        function goToProfile() { alert('个人中心'); }
+    </script>
+</body>
+</html>

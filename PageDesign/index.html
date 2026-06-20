@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目管理系统 - 原型预览</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .page-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+        }
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .page-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .nav-tab {
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .nav-tab:hover, .nav-tab.active {
+            background: white;
+            color: #667eea;
+        }
+        .phone-frame {
+            width: 393px;
+            height: 852px;
+            background: #1c1c1e;
+            border-radius: 52px;
+            padding: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #f5f5f7;
+            border-radius: 44px;
+            overflow: hidden;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .footer-info {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 20px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <div class="page-title">项目管理系统</div>
+        <div class="page-subtitle">高效协作，精准管理 - 高保真原型</div>
+    </div>
+    
+    <div class="nav-tabs">
+        <div class="nav-tab active" data-page="login.html">登录页</div>
+        <div class="nav-tab" data-page="team-kanban.html">团队看板</div>
+        <div class="nav-tab" data-page="personal-kanban.html">个人看板</div>
+        <div class="nav-tab" data-page="management-dashboard.html">管理看板</div>
+        <div class="nav-tab" data-page="project-detail.html">项目详情</div>
+        <div class="nav-tab" data-page="project-create.html">创建项目</div>
+        <div class="nav-tab" data-page="reserve-projects.html">储备项目库</div>
+        <div class="nav-tab" data-page="system-admin.html">系统管理</div>
+    </div>
+    
+    <div class="phone-frame">
+        <div class="phone-screen">
+            <iframe id="main-content" src="login.html"></iframe>
+        </div>
+    </div>
+    
+    <div class="footer-info">
+        模拟 iPhone 15 Pro 尺寸 | 支持 iOS/Android/网页三端
+    </div>
+
+    <script>
+        const tabs = document.querySelectorAll('.nav-tab');
+        const content = document.getElementById('main-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                content.src = tab.dataset.page;
+            });
+        });
+    </script>
+</body>
+</html>

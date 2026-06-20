@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目详情</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f5f5f7;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .status-bar {
+            height: 47px;
+            background: #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+        }
+        .nav-header {
+            background: white;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        .nav-back {
+            width: 36px;
+            height: 36px;
+            background: #f0f0f2;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #666;
+        }
+        .nav-title { font-size: 17px; font-weight: 600; color: #1c1c1e; }
+        .nav-actions { display: flex; gap: 12px; }
+        .nav-btn {
+            width: 36px;
+            height: 36px;
+            background: #f0f0f2;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #666;
+        }
+        .content-area { flex: 1; padding: 16px; overflow-y: auto; }
+        .project-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 16px;
+            color: white;
+        }
+        .project-name { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+        .project-id { font-size: 14px; opacity: 0.8; margin-bottom: 16px; }
+        .progress-bar { height: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
+        .progress-fill { height: 100%; background: white; border-radius: 4px; width: 60%; }
+        .progress-info { display: flex; justify-content: space-between; font-size: 13px; opacity: 0.9; }
+        .info-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-bottom: 16px;
+        }
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1c1c1e;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f2;
+        }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { font-size: 14px; color: #8e8e93; }
+        .info-value { font-size: 14px; color: #1c1c1e; font-weight: 500; }
+        .info-value.time { color: #ff9500; background: #fff8e5; padding: 4px 10px; border-radius: 8px; }
+        .info-value.overdue { color: #ff3b30; background: #ffeef0; }
+        .info-value.person { display: flex; align-items: center; gap: 8px; }
+        .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .benefit-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-bottom: 16px;
+        }
+        .benefit-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .benefit-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1c1c1e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .benefit-rate { font-size: 24px; font-weight: 700; color: #34c759; }
+        .benefit-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f2;
+        }
+        .benefit-row:last-child { border-bottom: none; }
+        .benefit-label { font-size: 14px; color: #8e8e93; }
+        .benefit-value { font-size: 16px; font-weight: 600; color: #1c1c1e; }
+        .notes-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-bottom: 16px;
+        }
+        .notes-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .notes-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1c1c1e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .add-note-btn { font-size: 13px; color: #667eea; font-weight: 500; cursor: pointer; }
+        .note-item {
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+        .note-item:last-child { margin-bottom: 0; }
+        .note-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .note-author { display: flex; align-items: center; gap: 8px; }
+        .note-author .avatar { width: 24px; height: 24px; font-size: 11px; }
+        .note-author-name { font-size: 13px; font-weight: 500; color: #1c1c1e; }
+        .note-time { font-size: 11px; color: #c7c7cc; }
+        .note-content { font-size: 14px; color: #666; line-height: 1.5; }
+        .difficulty-tag {
+            display: inline-block;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+        .difficulty-tag.pending { background: #ffeef0; color: #ff3b30; }
+        .difficulty-tag.processing { background: #fff8e5; color: #ff9500; }
+        .difficulty-tag.resolved { background: #e8f5e9; color: #34c759; }
+        .transfer-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-bottom: 16px;
+        }
+        .transfer-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1c1c1e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .transfer-item {
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
+        .transfer-item:last-child { margin-bottom: 0; }
+        .transfer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .transfer-info { font-size: 13px; color: #666; }
+        .transfer-info span { color: #1c1c1e; font-weight: 500; }
+        .transfer-time { font-size: 11px; color: #c7c7cc; }
+        .transfer-reason { font-size: 12px; color: #8e8e93; background: white; padding: 6px 10px; border-radius: 8px; }
+        .action-bar {
+            background: white;
+            padding: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+        .action-btn {
+            flex: 1;
+            min-width: calc(50% - 5px);
+            height: 44px;
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+        .action-btn.primary { background: #667eea; color: white; }
+        .action-btn.primary:hover { background: #5a6fd6; }
+        .action-btn.secondary { background: #f0f0f2; color: #666; }
+        .action-btn.secondary:hover { background: #e5e5ea; }
+        .action-btn.danger { background: #ffeef0; color: #ff3b30; }
+        .action-btn.danger:hover { background: #ffe0e0; }
+    </style>
+</head>
+<body>
+    <div class="status-bar">
+        <span>9:41</span>
+        <span><i class="fa-solid fa-signal"></i> <i class="fa-solid fa-wifi"></i> <i class="fa-solid fa-battery-full"></i></span>
+    </div>
+    
+    <div class="nav-header">
+        <div class="nav-back" onclick="goBack()"><i class="fa-solid fa-chevron-left"></i></div>
+        <div class="nav-title">项目详情</div>
+        <div class="nav-actions">
+            <div class="nav-btn"><i class="fa-solid fa-star"></i></div>
+            <div class="nav-btn"><i class="fa-solid fa-share-alt"></i></div>
+        </div>
+    </div>
+    
+    <div class="content-area">
+        <div class="project-header">
+            <div class="project-name">客户E装修贷款</div>
+            <div class="project-id">项目编号：PRJ-2024-0422-003</div>
+            <div class="progress-bar"><div class="progress-fill"></div></div>
+            <div class="progress-info"><span>当前环节：收资料-建档</span><span>进度：60%</span></div>
+        </div>
+        
+        <div class="info-card">
+            <div class="card-title"><i class="fa-solid fa-info-circle"></i>基础信息</div>
+            <div class="info-row"><span class="info-label">创建人</span><span class="info-value person"><div class="avatar">孙</div><span>孙七</span></span></div>
+            <div class="info-row"><span class="info-label">创建时间</span><span class="info-value">2024-04-22 14:30</span></div>
+            <div class="info-row"><span class="info-label">项目负责人</span><span class="info-value person"><div class="avatar">孙</div><span>孙七</span></span></div>
+            <div class="info-row"><span class="info-label">预计完成时间</span><span class="info-value">2024-05-06</span></div>
+            <div class="info-row"><span class="info-label">当前停留时间</span><span class="info-value time overdue">5天2小时</span></div>
+            <div class="info-row"><span class="info-label">关联客户</span><span class="info-value">客户E</span></div>
+        </div>
+        
+        <div class="benefit-card">
+            <div class="benefit-header"><div class="benefit-title"><i class="fa-solid fa-chart-line"></i>效益信息</div><div class="benefit-rate">68%</div></div>
+            <div class="benefit-row"><span class="benefit-label">预计效益</span><span class="benefit-value">¥ 50,000</span></div>
+            <div class="benefit-row"><span class="benefit-label">已产生效益</span><span class="benefit-value">¥ 34,000</span></div>
+        </div>
+        
+        <div class="notes-card">
+            <div class="notes-header"><div class="notes-title"><i class="fa-solid fa-clipboard-list"></i>问题与备注</div><span class="add-note-btn">添加备注</span></div>
+            <div class="note-item">
+                <div class="note-header"><div class="note-author"><div class="avatar">孙</div><span class="note-author-name">孙七</span></div><span class="note-time">04-28 10:30</span></div>
+                <div class="note-content">客户需要补充收入证明和房产证明，已多次催促仍未提交</div>
+                <span class="difficulty-tag pending">待解决</span>
+            </div>
+            <div class="note-item">
+                <div class="note-header"><div class="note-author"><div class="avatar">李</div><span class="note-author-name">李四</span></div><span class="note-time">04-26 15:20</span></div>
+                <div class="note-content">已收集客户基本资料，包括身份证、户口本等</div>
+            </div>
+        </div>
+        
+        <div class="transfer-card">
+            <div class="transfer-title"><i class="fa-solid fa-exchange-alt"></i>流转记录</div>
+            <div class="transfer-item">
+                <div class="transfer-header"><div class="transfer-info"><span>孙七</span> → <span>孙七</span><span style="margin-left:8px;">收资料-建档</span></div><span class="transfer-time">04-22 14:30</span></div>
+                <span class="transfer-reason">环节推进：项目创建，进入收资料环节</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="action-bar">
+        <button class="action-btn secondary" onclick="editProject()"><i class="fa-solid fa-edit"></i>编辑项目</button>
+        <button class="action-btn primary" onclick="startTransfer()"><i class="fa-solid fa-arrow-right"></i>发起流转</button>
+        <button class="action-btn secondary" onclick="addNote()"><i class="fa-solid fa-comment"></i>添加备注</button>
+        <button class="action-btn secondary" onclick="markDifficulty()"><i class="fa-solid fa-flag"></i>标记难点</button>
+        <button class="action-btn danger" onclick="submitAbolish()"><i class="fa-solid fa-trash"></i>提交废止审批</button>
+    </div>
+    
+    <script>
+        function goBack() { window.parent.document.getElementById('main-content').src = 'team-kanban.html'; }
+        function editProject() { alert('编辑项目'); }
+        function startTransfer() { alert('发起流转'); }
+        function addNote() { alert('添加备注'); }
+        function markDifficulty() { alert('标记难点'); }
+        function submitAbolish() { alert('提交废止审批'); }
+    </script>
+</body>
+</html>
